@@ -2,7 +2,7 @@
 
 A minimal, dependency-free example of consuming the **FVD Patterns API** from a web page.
 
-- OpenAPI spec (v4): <https://staging-pat4.api.fvd.bz/openapi/v4.json>
+- OpenAPI spec (v4): <https://pat4.api.fvd.bz/openapi/v4.json>
 
 ## Demo
 
@@ -15,7 +15,7 @@ image, covered vehicles, square footage, difficulty and price.
 Edit the two variables at the top of the `<script>` block in `index.html`:
 
 ```js
-var API = "https://staging-pat4.api.fvd.bz/";  // base URL of the Patterns API deployment
+var API = "https://pat4.api.fvd.bz/";  // base URL of the Patterns API deployment
 var KEY = "YOUR-API-KEY";                       // API key issued for your domain
 ```
 
@@ -46,3 +46,9 @@ Opening the file directly via `file://` will not work, because the request origi
 The API also exposes `GET /types`, `GET /patterndetails/{patternId}` and a `GET /` health check — see the spec for details.
 
 Data responses are wrapped in an envelope `{ Success, Data, Errors }`; access errors (401/403) are returned as plain text.
+
+> [!WARNING]
+> **`PatternID` is a protected, time-limited token, not a permanent identifier.** Every `PatternID` returned by
+> `/patterns/...` expires after a short time. Never store it on the client side (`localStorage`, `sessionStorage`,
+> cookies, IndexedDB, bookmarks or cached URLs) and never reuse it across sessions. Use it right away for
+> `/patterndetails/{patternId}` or `/patterns/preview/...`, and request the pattern list again to get a fresh token.
