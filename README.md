@@ -2,6 +2,7 @@
 
 A minimal, dependency-free example of consuming the **FVD Patterns API** from a web page.
 
+- API description: <https://pat4.api.fvd.bz/swagger>
 - OpenAPI spec (v4): <https://pat4.api.fvd.bz/openapi/v4.json>
 
 ## Demo
