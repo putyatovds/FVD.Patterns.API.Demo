@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FVD Patterns API Demo</title>
+  <style>
+    /* ── Reset & base ───────────────────────────── */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg: #f7f7f5;
+      --surface: #ffffff;
+      --border: #e2e2e2;
+      --accent: #1a1a1a;
+      --accent2: #c0392b;
+      --text: #1a1a1a;
+      --muted: #888;
+      --radius: 6px;
+      --font-head: 'Georgia', 'Times New Roman', serif;
+      --font-body: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      --shadow: 0 2px 12px rgba(0, 0, 0, .07);
+    }
+
+    body {
+      background: var(--bg);
+      font-family: var(--font-body);
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.5;
+    }
+
+    /* ── Layout ─────────────────────────────────── */
+    .wrap {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 32px 20px;
+    }
+
+    /* ── Header ─────────────────────────────────── */
+    .page-header {
+      border-bottom: 2px solid var(--accent);
+      margin-bottom: 32px;
+      padding-bottom: 16px;
+    }
+
+    .page-header h1 {
+      font-family: var(--font-head);
+      font-size: 26px;
+      letter-spacing: -0.5px;
+    }
+
+    .page-header p {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 4px;
+    }
+
+    /* ── Filter panel ────────────────────────────── */
+    .filter-panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      margin-bottom: 32px;
+      box-shadow: var(--shadow);
+    }
+
+    .filter-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+
+    @media (max-width: 640px) {
+      .filter-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .filter-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .filter-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    /* ── Select ──────────────────────────────────── */
+    select {
+      display: block;
+      width: 100%;
+      padding: 9px 30px 9px 10px;
+      font-size: 14px;
+      font-family: var(--font-body);
+      color: var(--text);
+      background-color: var(--surface);
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23888'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      appearance: none;
+      -webkit-appearance: none;
+      cursor: pointer;
+      transition: border-color .15s, box-shadow .15s;
+    }
+
+    select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(26, 26, 26, .1);
+    }
+
+    select:disabled {
+      background-color: #f0f0ee;
+      color: #bbb;
+      cursor: not-allowed;
+    }
+
+    /* ── Error alert ─────────────────────────────── */
+    .alert {
+      display: none;
+      position: relative;
+      padding: 14px 40px 14px 16px;
+      margin-bottom: 24px;
+      border-radius: var(--radius);
+      font-size: 14px;
+      background: #fdf2f2;
+      border: 1px solid #f5c6cb;
+      color: #922;
+    }
+
+    .alert .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      background: none;
+      border: none;
+      font-size: 18px;
+      line-height: 1;
+      cursor: pointer;
+      color: #922;
+    }
+
+    .alert .close-btn:hover {
+      color: #600;
+    }
+
+    /* ── Loading spinner ─────────────────────────── */
+    .spinner-wrap {
+      display: none;
+      text-align: center;
+      padding: 48px 0;
+    }
+
+    .spinner {
+      display: inline-block;
+      width: 36px;
+      height: 36px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+
+    .spinner-label {
+      margin-top: 12px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    /* ── Patterns list ───────────────────────────── */
+    #PatternsList {
+      display: none;
+    }
+
+    .pattern-card {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 0;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 14px;
+      box-shadow: var(--shadow);
+      transition: box-shadow .2s;
+    }
+
+    .pattern-card:hover {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .12);
+    }
+
+    @media (max-width: 560px) {
+      .pattern-card {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .pattern-thumb {
+      background: #f0f0ee;
+      overflow: hidden;
+      aspect-ratio: 4/3;
+    }
+
+    .pattern-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .pattern-body {
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .pattern-title {
+      font-family: var(--font-head);
+      font-size: 17px;
+      font-weight: normal;
+      line-height: 1.3;
+    }
+
+    .pattern-vehicles {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .pattern-vehicles li {
+      font-size: 13px;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .vehicle-id {
+      font-family: 'Courier New', monospace;
+      font-size: 11px;
+      background: #f0f0ee;
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 1px 5px;
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .pattern-meta {
+      font-size: 12px;
+      color: var(--muted);
+    }
+
+    .pattern-meta span+span::before {
+      content: '·';
+      margin: 0 6px;
+    }
+
+    .pattern-price {
+      font-size: 20px;
+      font-family: var(--font-body);
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0;
+      color: var(--accent);
+      margin-top: auto;
+    }
+
+    /* ── Empty state ─────────────────────────────── */
+    .empty-state {
+      display: none;
+      text-align: center;
+      padding: 56px 20px;
+      color: var(--muted);
+    }
+
+    .empty-state svg {
+      margin-bottom: 16px;
+      opacity: .35;
+    }
+
+    .empty-state p {
+      font-size: 14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="wrap">
+
+    <header class="page-header">
+      <h1>FVD Patterns</h1>
+      <p>Select a vehicle to browse available vinyl patterns.</p>
+    </header>
+
+    <div class="filter-panel">
+      <div class="filter-grid">
+        <div class="filter-group">
+          <label for="SelectYears">Year</label>
+          <select id="SelectYears" disabled></select>
+        </div>
+        <div class="filter-group">
+          <label for="SelectMakes">Make</label>
+          <select id="SelectMakes" disabled></select>
+        </div>
+        <div class="filter-group">
+          <label for="SelectModels">Model</label>
+          <select id="SelectModels" disabled></select>
+        </div>
+        <div class="filter-group">
+          <label for="SelectTrims">Trim</label>
+          <select id="SelectTrims" disabled></select>
+        </div>
+      </div>
+    </div>
+
+    <div id="error" class="alert" role="alert">
+      <button class="close-btn" id="closeError" aria-label="Dismiss error">×</button>
+      <span id="errorMsg"></span>
+    </div>
+
+    <div class="spinner-wrap" id="spinner">
+      <div class="spinner"></div>
+      <div class="spinner-label">Loading patterns…</div>
+    </div>
+
+    <div class="empty-state" id="emptyState">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <rect x="2" y="7" width="20" height="14" rx="2" />
+        <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" />
+      </svg>
+      <p>No patterns found for this selection.</p>
+    </div>
+
+    <div id="PatternsList"></div>
+
+  </div>
+
+  <script>
+    /* ── Configuration ───────────────────────────── */
+    /* Base URL of your Patterns API deployment and the API key issued for this page's domain.
+       The key is checked together with the page's host, so it only works from allowed domains. */
+    var API = "https://services.filmvinyldesigns.com/api/patterns/v3/";
+    var KEY = "YOUR-API-KEY";
+
+    var LEVELS = ["SelectMakes", "SelectModels", "SelectTrims"];
+
+    /* ── Helpers ─────────────────────────────────── */
+    function el(id) { return document.getElementById(id); }
+
+    function enc(v) { return encodeURIComponent(v); }
+
+    /* One in-flight request per slot. Starting a new request aborts the previous one in the same
+       slot, so a slow, stale response can never overwrite a newer selection. */
+    var pending = {};
+
+    function abort(slot) {
+      if (pending[slot]) {
+        pending[slot].abort();
+        delete pending[slot];
+      }
+    }
+
+    function get(slot, path, cb) {
+      abort(slot);
+      var ctrl = new AbortController();
+      pending[slot] = ctrl;
+
+      fetch(API + path, { headers: { "fvd-patterns-api-key": KEY }, signal: ctrl.signal })
+        .then(function (res) {
+          /* Access errors (401/403) come back as plain text, data responses as a JSON envelope. */
+          return res.text().then(function (text) {
+            if (!res.ok) throw new Error(res.status + ": " + (text || res.statusText || "Request failed"));
+            var data = JSON.parse(text);
+            if (!data.Success) throw new Error((data.Errors || []).join(", ") || "Request failed");
+            return data.Data;
+          });
+        })
+        .then(function (data) {
+          delete pending[slot];
+          cb(null, data);
+        })
+        .catch(function (err) {
+          if (err.name === "AbortError") return;
+          delete pending[slot];
+          cb(err instanceof TypeError ? "Network error" : err.message);
+        });
+    }
+
+    function fmt(n, opts) { return new Intl.NumberFormat("en-US", opts).format(n); }
+
+    function showError(msg) {
+      el("errorMsg").textContent = msg;
+      el("error").style.display = "block";
+    }
+
+    function clearError() {
+      el("error").style.display = "none";
+      el("errorMsg").textContent = "";
+    }
+
+    function setSpinner(on) {
+      el("spinner").style.display = on ? "block" : "none";
+    }
+
+    function span(className, text) {
+      var s = document.createElement("span");
+      if (className) s.className = className;
+      s.textContent = text;
+      return s;
+    }
+
+    function populateSelect(sel, data) {
+      sel.innerHTML = '<option value="0"></option>';
+      data.forEach(function (item) {
+        var opt = document.createElement("option");
+        opt.value = item.ID;
+        opt.textContent = item.Value;
+        sel.appendChild(opt);
+      });
+      sel.disabled = false;
+    }
+
+    function clearResults() {
+      abort("patterns");
+      setSpinner(false);
+      el("PatternsList").style.display = "none";
+      el("PatternsList").innerHTML = "";
+      el("emptyState").style.display = "none";
+    }
+
+    /* Clears and disables the given select and every select after it, cancels their pending
+       requests and hides the patterns shown for the previous selection. */
+    function resetFrom(selId) {
+      LEVELS.slice(LEVELS.indexOf(selId)).forEach(function (id) {
+        abort(id);
+        var s = el(id);
+        s.innerHTML = '<option value="0"></option>';
+        s.disabled = true;
+      });
+      clearResults();
+    }
+
+    function loadLevel(selId, path) {
+      get(selId, path, function (err, data) {
+        if (err) return showError(err);
+        populateSelect(el(selId), data);
+      });
+    }
+
+    /* ── Dismiss error ───────────────────────────── */
+    el("closeError").addEventListener("click", clearError);
+
+    /* ── Year load ───────────────────────────────── */
+    loadLevel("SelectYears", "years/0/0");
+
+    /* ── Year → Makes ────────────────────────────── */
+    el("SelectYears").addEventListener("change", function () {
+      resetFrom("SelectMakes");
+      clearError();
+      if (!this.value || this.value === "0") return;
+      loadLevel("SelectMakes", "makes/" + enc(this.value));
+    });
+
+    /* ── Make → Models ───────────────────────────── */
+    el("SelectMakes").addEventListener("change", function () {
+      resetFrom("SelectModels");
+      clearError();
+      if (!this.value || this.value === "0") return;
+      loadLevel("SelectModels", "models/" + enc(this.value) + "/" + enc(el("SelectYears").value));
+    });
+
+    /* ── Model → Trims ───────────────────────────── */
+    el("SelectModels").addEventListener("change", function () {
+      resetFrom("SelectTrims");
+      clearError();
+      if (!this.value || this.value === "0") return;
+      loadLevel("SelectTrims", "trims/" + enc(this.value) + "/" + enc(el("SelectYears").value));
+    });
+
+    /* ── Trim → Patterns ─────────────────────────── */
+    el("SelectTrims").addEventListener("change", function () {
+      clearError();
+      clearResults();
+      if (!this.value || this.value === "0") return;
+
+      var path = "patterns/" + enc(el("SelectModels").value) + "/" + enc(this.value) + "/" + enc(el("SelectYears").value);
+
+      setSpinner(true);
+      get("patterns", path, function (err, data) {
+        setSpinner(false);
+        if (err) return showError(err);
+
+        var list = el("PatternsList");
+        list.innerHTML = "";
+
+        if (!data || data.length === 0) {
+          el("emptyState").style.display = "block";
+          return;
+        }
+
+        data.forEach(function (p) {
+          /* Card */
+          var card = document.createElement("div");
+          card.className = "pattern-card";
+
+          /* Thumbnail: PatternID is a short-lived token; the preview endpoint needs no API key. */
+          var thumb = document.createElement("div");
+          thumb.className = "pattern-thumb";
+          var img = document.createElement("img");
+          img.src = API + "patterns/preview/" + enc(p.PatternID) + "/360/260";
+          img.alt = p.Description;
+          img.loading = "lazy";
+          thumb.appendChild(img);
+
+          /* Body */
+          var body = document.createElement("div");
+          body.className = "pattern-body";
+
+          var title = document.createElement("h2");
+          title.className = "pattern-title";
+          title.textContent = p.Description;
+          body.appendChild(title);
+
+          if (p.Vehicles && p.Vehicles.length) {
+            var ul = document.createElement("ul");
+            ul.className = "pattern-vehicles";
+            p.Vehicles.forEach(function (v) {
+              var li = document.createElement("li");
+              li.appendChild(span("vehicle-id", v.ID));
+              li.appendChild(span(null, [v.Make.Value, v.Model.Value, v.Trim.Value,
+                v.YearFrom + "–" + v.YearTo].join(" ")));
+              ul.appendChild(li);
+            });
+            body.appendChild(ul);
+          }
+
+          var meta = document.createElement("p");
+          meta.className = "pattern-meta";
+          meta.appendChild(span(null, fmt(p.Sqft, { maximumFractionDigits: 2 }) + " sqft"));
+          meta.appendChild(span(null, "Difficulty " + fmt(p.Difficulty, { maximumFractionDigits: 2 })));
+          body.appendChild(meta);
+
+          var price = document.createElement("div");
+          price.className = "pattern-price";
+          price.textContent = fmt(p.Price, { style: "currency", currency: "USD" });
+          body.appendChild(price);
+
+          card.appendChild(thumb);
+          card.appendChild(body);
+          list.appendChild(card);
+        });
+
+        list.style.display = "block";
+      });
+    });
+  </script>
+
+</body>
+
+</html>
