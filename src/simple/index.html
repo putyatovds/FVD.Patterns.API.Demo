@@ -367,9 +367,10 @@
 
   <script>
     /* ── Configuration ───────────────────────────── */
-    /* Base URL of your Patterns API deployment and the API key issued for this page's domain.
-       The key is checked together with the page's host, so it only works from allowed domains. */
-    var API = "https://services.filmvinyldesigns.com/api/patterns/v3/";
+    // switch to "https://pat4.api.fvd.bz/" for production
+    var API = "https://staging-pat4.api.fvd.bz/";
+
+    /* The key is checked together with the page's host, so it only works from allowed domains. */
     var KEY = "YOUR-API-KEY";
 
     var LEVELS = ["SelectMakes", "SelectModels", "SelectTrims"];
@@ -537,7 +538,7 @@
           var thumb = document.createElement("div");
           thumb.className = "pattern-thumb";
           var img = document.createElement("img");
-          img.src = API + "patterns/preview/" + enc(p.PatternID) + "/360/260";
+          img.src = API + "patterns/preview/" + enc(p.PatternID) + "/1"; /* size 1 = 360x270 */
           img.alt = p.Description;
           img.loading = "lazy";
           thumb.appendChild(img);

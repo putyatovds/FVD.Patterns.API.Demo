@@ -2,8 +2,10 @@
 
 A minimal, dependency-free example of consuming the **FVD Patterns API** from a web page.
 
-- API description: <https://pat4.api.fvd.bz/swagger>
-- OpenAPI spec (v4): <https://pat4.api.fvd.bz/openapi/v4.json>
+| Environment | Base URL | API description | OpenAPI spec (v4) |
+| --- | --- | --- | --- |
+| Production | `https://pat4.api.fvd.bz/` | <https://pat4.api.fvd.bz/swagger> | <https://pat4.api.fvd.bz/openapi/v4.json> |
+| Staging | `https://staging-pat4.api.fvd.bz/` | <https://staging-pat4.api.fvd.bz/swagger> | <https://staging-pat4.api.fvd.bz/openapi/v4.json> |
 
 ## Demo
 
@@ -16,9 +18,12 @@ image, covered vehicles, square footage, difficulty and price.
 Edit the two variables at the top of the `<script>` block in `index.html`:
 
 ```js
-var API = "https://pat4.api.fvd.bz/";  // base URL of the Patterns API deployment
+// switch to "https://pat4.api.fvd.bz/" for production
+var API = "https://staging-pat4.api.fvd.bz/";   // base URL of the Patterns API
 var KEY = "YOUR-API-KEY";                       // API key issued for your domain
 ```
+
+The demo points at the **staging** slot by default; change `API` to the production URL before going live.
 
 The key is sent in the `fvd-patterns-api-key` header. It is validated together with the request origin, so the page
 only works when served from a host that is allowed for that key.
@@ -39,14 +44,26 @@ Opening the file directly via `file://` will not work, because the request origi
 | --- | --- |
 | `GET /years/{modelid}/{trimid}` | Years with patterns (`0/0` = all) |
 | `GET /makes/{year}` | Makes for a year |
-| `GET /models/{makeId}/{year}` | Models of a make for a year |
-| `GET /trims/{modelId}/{year}` | Trims of a model for a year |
+| `GET /models/{id}/{year}` | Models of a make (`id` = make ID) for a year |
+| `GET /trims/{id}/{year}` | Trims of a model (`id` = model ID) for a year |
 | `GET /patterns/{modelid}/{trimid}/{year}` | Patterns for the selected vehicle |
-| `GET /patterns/preview/{id}/{w}/{h}` | Preview image (no API key; `id` is the short-lived `PatternID` token) |
+| `GET /patterns/preview/{id}/{size}` | Preview image (no API key; `id` is the short-lived `PatternID` token) |
 
-The API also exposes `GET /types`, `GET /patterndetails/{patternId}` and a `GET /` health check — see the spec for details.
+The preview `size` is a preset, not a width/height pair:
 
-Data responses are wrapped in an envelope `{ Success, Data, Errors }`; access errors (401/403) are returned as plain text.
+| `size` | Dimensions |
+| --- | --- |
+| `1` | 360 × 270 |
+| `2` | 640 × 480 |
+| `3` | 800 × 600 |
+
+All presets are 4:3, matching the demo's thumbnail aspect ratio. The demo uses size `1`.
+
+The API also exposes `GET /types` (pattern types available to your key), `GET /patterndetails/{patternId}` (a single
+pattern) and a `GET /` health check (no API key; returns `{ message, version }`) — see the spec for details.
+
+Data responses are wrapped in an envelope `{ Success, Data, Host, Errors }`; access errors (401/403) are returned as
+plain text (e.g. `Api key is null`).
 
 > [!WARNING]
 > **`PatternID` is a protected, time-limited token, not a permanent identifier.** Every `PatternID` returned by
