@@ -13,6 +13,16 @@ A minimal, dependency-free example of consuming the **FVD Patterns API** from a 
 **Year → Make → Model → Trim** from cascading dropdowns and then lists the matching vinyl patterns with a preview
 image, covered vehicles, square footage, difficulty and price.
 
+## How to get access to API
+
+Request access by sending the following information to [api@fvd.bz](mailto:api@fvd.bz):
+
+1. License key number.
+2. List of domains/IPs you will be using to make API calls from.
+3. Brief description of your project.
+
+You will receive the API key in a reply email.
+
 ## Configuration
 
 Edit the two variables at the top of the `<script>` block in `index.html`:
